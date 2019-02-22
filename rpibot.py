@@ -56,13 +56,14 @@ async def help(ctx):
 async def nukeme(ctx):
     '''Deletes your messages in #support. Does not work in any other channel.'''
     with ctx.typing():
-        if ctx.channel.id in secrets['nuke_channels']:
-            print('################################ channel matches')
-            history = ctx.channel.history(limit=None).flatten()
+        if str(ctx.channel.id) in secrets['nuke_channels']:
+            history = await ctx.channel.history(limit=None).flatten()
             filtered = [x for x in history if x.author.id == ctx.author.id]
-            ctx.channel.delete_messages(filtered)
+            filtered_chunks = [filtered[i:i+100] for i in range(0, len(filtered), 100)]
+            for c in filtered_chunks:
+                await ctx.channel.delete_messages(c)
             try:
-                await ctx.message.add_reaction("✅")
+                await ctx.channel.send("✅")
             except:
                 return
         else:
