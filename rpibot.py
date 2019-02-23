@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging, json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 logging.basicConfig(level=logging.INFO)
 
@@ -52,18 +52,31 @@ async def help(ctx):
         embed = embed.add_field(name=pfx+cmd.name, value=v, inline=False)
     await ctx.send(embed=embed)
 
-@bot.command(aliases=['nuke'])
-async def nukeme(ctx):
-    '''Deletes your messages in #support. Does not work in any other channel.'''
-    with ctx.typing():
+@bot.command()
+async def delete(ctx, rng : str = ''):
+    '''Deletes your messages in #support. Does not work in any other channel.
+    Needs a range, either in hours or `all`.'''
+    async with ctx.typing():
         if str(ctx.channel.id) in secrets['nuke_channels']:
-            history = await ctx.channel.history(limit=None).flatten()
-            filtered = [x for x in history if x.author.id == ctx.author.id]
+            if rng == '':
+                    await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
+                    return
+            if rng == 'all':
+                after_date = None
+            else:
+                try:
+                    rng = float(rng)
+                    after_date = datetime.utcnow() - timedelta(hours=rng)
+                except:
+                    await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
+                    return
+            history = await ctx.channel.history(limit=None, after=after_date, reverse=True).flatten()
+            filtered = [x for x in history if x.author.id == ctx.author.id][:-1]
             filtered_chunks = [filtered[i:i+100] for i in range(0, len(filtered), 100)]
             for c in filtered_chunks:
                 await ctx.channel.delete_messages(c)
             try:
-                await ctx.channel.send("✅")
+                await ctx.message.add_reaction("✅")
             except:
                 return
         else:
