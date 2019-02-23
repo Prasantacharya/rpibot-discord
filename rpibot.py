@@ -42,20 +42,23 @@ async def ping(ctx):
 @bot.command(aliases=['h'])
 async def help(ctx):
     '''Show this message.'''
-    embed = discord.Embed(title='Commands', description=bot.description, colour=green)
-    cmds = sorted(list(bot.commands), key=lambda x:x.name)
-    for cmd in cmds:
-        v = cmd.help
-        if len(cmd.aliases) > 0:
-            v += '\n*Aliases:* ?' +\
-                f', {pfx}'.join(cmd.aliases).rstrip(f', {pfx}')
-        embed = embed.add_field(name=pfx+cmd.name, value=v, inline=False)
+    with ctx.typing():
+        embed = discord.Embed(title='Commands', description=bot.description, colour=green)
+        cmds = sorted(list(bot.commands), key=lambda x:x.name)
+        for cmd in cmds:
+            if cmd.name in ['restart', 'shutdown']:
+                continue
+            v = cmd.help
+            if len(cmd.aliases) > 0:
+                v += '\n*Aliases:* ?' +\
+                    f', {pfx}'.join(cmd.aliases).rstrip(f', {pfx}')
+            embed = embed.add_field(name=pfx+cmd.name, value=v, inline=False)
     await ctx.send(embed=embed)
 
 @bot.command()
 async def delete(ctx, rng : str = ''):
     '''Deletes your messages in #support. Does not work in any other channel.
-    Needs a range, either in hours or `all`.'''
+    Needs a range, either in hours as a float or `all`.'''
     async with ctx.typing():
         if str(ctx.channel.id) in secrets['nuke_channels']:
             if rng == '':
