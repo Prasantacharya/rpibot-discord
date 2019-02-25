@@ -64,7 +64,7 @@ async def delete(ctx, rng : str = ''):
             if rng == '':
                     await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
                     return
-            if rng == 'all':
+            if rng.lower() == 'all':
                 after_date = None
             else:
                 try:
