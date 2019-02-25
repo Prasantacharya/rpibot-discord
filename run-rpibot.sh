@@ -2,5 +2,5 @@
 
 while true; do
     git pull;
-    python qrmbot.py || exit 1;
+    python rpibot.py || exit 1;
 done
