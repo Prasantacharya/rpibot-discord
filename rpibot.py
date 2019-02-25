@@ -64,7 +64,7 @@ async def delete(ctx, rng : str = ''):
             if rng == '':
                     await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
                     return
-            if rng.lower() == 'all':
+            elif rng.lower() == 'all':
                 after_date = None
             else:
                 try:
@@ -77,7 +77,7 @@ async def delete(ctx, rng : str = ''):
             filtered = [x for x in history if x.author.id == ctx.author.id][:-1]
             filtered_chunks = [filtered[i:i+100] for i in range(0, len(filtered), 100)]
             for c in filtered_chunks:
-                if c[0].created_at <= (datetime.utcnow() - timedelta(days=14)):
+                if c[0].created_at <= (datetime.utcnow() - timedelta(days=14)) or c[-1].created_at <= (datetime.utcnow() - timedelta(days=14)):
                     for m in c:
                         await m.delete()
                 else:
