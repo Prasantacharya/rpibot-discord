@@ -69,6 +69,9 @@ async def delete(ctx, rng : str = ''):
                 filtered = [x for x in history if x.author.id == ctx.author.id][:-1]
                 for m in filtered:
                     print(m.content)
+            elif rng.lower() == 'me':
+                await ctx.send("No.")
+                return
             else:
                 try:
                     rng = float(rng)
