@@ -77,7 +77,11 @@ async def delete(ctx, rng : str = ''):
             filtered = [x for x in history if x.author.id == ctx.author.id][:-1]
             filtered_chunks = [filtered[i:i+100] for i in range(0, len(filtered), 100)]
             for c in filtered_chunks:
-                await ctx.channel.delete_messages(c)
+                if c[0].created_at <= (datetime.utcnow() - timedelta(days=14)):
+                    for m in c:
+                        await m.delete()
+                else:
+                    await ctx.channel.delete_messages(c)
             try:
                 await ctx.message.add_reaction("✅")
             except:
