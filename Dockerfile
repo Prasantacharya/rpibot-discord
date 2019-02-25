@@ -1,4 +1,4 @@
-FROM gorialis/discord.py:3.6-rewrite-extras
+FROM gorialis/discord.py:3.7-rewrite-extras
 
 WORKDIR /app
 
@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "rpibot.py"]
+CMD ["./run-rpibot.sh"]
