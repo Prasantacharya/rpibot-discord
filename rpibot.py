@@ -65,10 +65,8 @@ async def delete(ctx, rng : str = ''):
                     await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
                     return
             elif rng.lower() == 'all':
-                history = await ctx.channel.history(limit=None, reverse=True).flatten()
+                history = await ctx.channel.history(limit=None).flatten()
                 filtered = [x for x in history if x.author.id == ctx.author.id][:-1]
-                for m in filtered:
-                    print(m.content)
             elif rng.lower() == 'me':
                 await ctx.send("No.")
                 return
@@ -78,8 +76,6 @@ async def delete(ctx, rng : str = ''):
                     after_date = datetime.utcnow() - timedelta(hours=rng)
                     history = await ctx.channel.history(limit=None, after=after_date).flatten()
                     filtered = [x for x in history if x.author.id == ctx.author.id][:-1]
-                    for m in filtered:
-                        print(m.content)
                 except:
                     await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
                     return
