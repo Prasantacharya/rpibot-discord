@@ -60,40 +60,34 @@ async def delete(ctx, rng : str = ''):
     '''Deletes your messages in #support. Does not work in any other channel.
     Needs a range, either in hours as a float or `all`.'''
     async with ctx.typing():
-        if str(ctx.channel.id) in secrets['nuke_channels']:
-            if rng == '':
-                    await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
-                    return
-            elif rng.lower() == 'all':
-                after_date = None
-            elif rng.lower() == 'me':
-                await ctx.send("No.")
+        if rng == '':
+                await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
                 return
-            else:
-                try:
-                    rng = float(rng)
-                    after_date = datetime.utcnow() - timedelta(hours=rng)
-                except:
-                    await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
-                    return
-            history = await ctx.channel.history(limit=None, after=after_date).flatten()
-            filtered = [x for x in history if x.author.id == ctx.author.id]
-            filtered_chunks = [filtered[i:i+100] for i in range(0, len(filtered), 100)]
-            for c in filtered_chunks:
-                if c[0].created_at <= (datetime.utcnow() - timedelta(days=14)) or c[-1].created_at <= (datetime.utcnow() - timedelta(days=14)):
-                    for m in c:
-                        await m.delete()
-                else:
-                    await ctx.channel.delete_messages(c)
-            try:
-                await ctx.send("✅")
-            except:
-                return
+        elif rng.lower() == 'all':
+            after_date = None
+        elif rng.lower() == 'me':
+            await ctx.send("No.")
+            return
         else:
             try:
-                await ctx.message.add_reaction("❌")
+                rng = float(rng)
+                after_date = datetime.utcnow() - timedelta(hours=rng)
             except:
+                await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
                 return
+        history = await ctx.channel.history(limit=None, after=after_date).flatten()
+        filtered = [x for x in history if x.author.id == ctx.author.id]
+        filtered_chunks = [filtered[i:i+100] for i in range(0, len(filtered), 100)]
+        for c in filtered_chunks:
+            if c[0].created_at <= (datetime.utcnow() - timedelta(days=14)) or c[-1].created_at <= (datetime.utcnow() - timedelta(days=14)):
+                for m in c:
+                    await m.delete()
+            else:
+                await ctx.channel.delete_messages(c)
+        try:
+            await ctx.send("✅")
+        except:
+            return
 
 
 # Special Commands
