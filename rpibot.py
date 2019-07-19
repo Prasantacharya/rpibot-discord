@@ -27,6 +27,13 @@ async def on_ready():
     print('------')
     await bot.change_presence(activity=discord.Game(name='with the Tute Screw'))
 
+@bot.event
+async def on_message(message):
+    if 'xd' in message.content.lower():
+        await message.add_reaction(discord.utils.find(lambda x: x.id == 564136561927651338, bot.emojis))
+
+    await bot.process_commands(message)
+
 @bot.command(aliases=['about'])
 async def info(ctx):
     '''Shows info about the bot.'''
