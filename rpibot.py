@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 import discord
-from discord.ext import commands
-from discord.ext.tasks import loop
+from discord.ext import commands, tasks
 import asyncio
 import logging
 from datetime import datetime, timedelta
@@ -208,7 +207,7 @@ async def shutdown(ctx):
         except:
             return
 
-@loop(seconds=60)
+@tasks.loop(seconds=60)
 async def alertCheckLoop():
     await bot.wait_until_ready()
     if (checkRPIAlert()):
