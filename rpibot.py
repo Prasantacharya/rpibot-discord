@@ -2,12 +2,71 @@
 
 import discord
 from discord.ext import commands
+from discord.ext.tasks import loop
 import asyncio
 import logging
 from datetime import datetime, timedelta
 import settings
+import requests
 
 logging.basicConfig(level=logging.INFO)
+
+# RPI Alert Tracking
+
+API_LINK = "https://alert.rpi.edu/alerts.js" # HTTPS for ComputerMan's protection
+ALERT_START = "alert_content = "
+ALERT_END = "alert_default ="
+
+LAST_ALERT_CACHED = ""
+ALERT_CACHE_TIME = datetime.now()
+
+'''
+    Polls the given API_LINK for alert changes
+    
+    Returns:
+        True if a new alert has been posted (or the existing alert has been updated)
+        False otherwise
+'''
+def checkRPIAlert():
+    global LAST_ALERT_CACHED
+    try:
+        web_request = requests.get(API_LINK).text
+        begin_index = web_request.find(ALERT_START)
+        end_index = web_request.find(ALERT_END)
+
+        # Prepare the text
+        alert_text = web_request[begin_index + len(ALERT_START) + 1 : end_index - 3].strip()
+
+        if not alert_text:
+            LAST_ALERT_CACHED = "No active alerts detected."
+            ALERT_CACHE_TIME = datetime.now()
+            return False
+
+        # Don't spam on startup
+        if not LAST_ALERT_CACHED:
+            LAST_ALERT_CACHED = alert_text
+            ALERT_CACHE_TIME = datetime.now()
+            return False
+        
+        if (LAST_ALERT_CACHED != alert_text):
+            # We have an RPI Alert!
+            # Let's hope its not too late!
+            ALERT_CACHE_TIME = datetime.now()
+            LAST_ALERT_CACHED = alert_text
+            return True
+
+    except Exception as ex:
+        print("Failed to check alert status!")
+        print(ex)
+        return False
+
+def createAlertEmbed():
+    embed = discord.Embed(title='**RPI ALERT**', description=LAST_ALERT_CACHED, colour=settings.red, url="https://alert.rpi.edu")
+    embed.set_thumbnail(url="https://bloximages.chicago2.vip.townnews.com/troyrecord.com/content/tncms/assets/v3/editorial/f/ff/ffffbaa8-4e3d-5b9b-b604-0e611c216a66/5b9ad2397e72d.image.jpg")
+    embed.set_footer(text="This alert was generated at " + (str(ALERT_CACHE_TIME)))
+    return embed
+
+# End RPI Alert Tracking
 
 description = '''A bot for the RPI discord server'''
 
@@ -41,6 +100,10 @@ async def info(ctx):
 @bot.command()
 async def ping(ctx):
     await ctx.send(f'**Pong!** Current ping is {bot.latency*1000:.1f} ms')
+
+@bot.command() 
+async def alert(ctx):
+    await ctx.send(embed = createAlertEmbed())
 
 @bot.command(aliases=['h'])
 async def help(ctx):
@@ -145,11 +208,18 @@ async def shutdown(ctx):
         except:
             return
 
+@loop(seconds=60)
+async def alertCheckLoop():
+    await bot.wait_until_ready()
+    if (checkRPIAlert()):
+        await bot.get_channel(settings.announcements_channel).send(embed=createAlertEmbed())
+
 #########################
 
 # check muted list
 
 token = open('token').read().strip()
 
+alertCheckLoop.start()
 bot.run(token)
 

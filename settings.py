@@ -12,3 +12,5 @@ red = 0xc91628
 blue = 0x2044f7
 hide_cmds = ['restart', 'shutdown', 'mute', 'unmute']
 
+# RPI Alert
+announcements_channel = 178200737422114816
