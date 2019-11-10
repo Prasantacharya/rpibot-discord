@@ -125,7 +125,7 @@ async def delete(ctx, rng : str = ''):
     async with ctx.typing():
         msg_time = ctx.message.created_at
         if rng == '':
-            await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
+            await ctx.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
             return
         elif rng.lower() == 'all':
             after_date = None
