@@ -47,7 +47,7 @@ def checkRPIAlert():
             ALERT_CACHE_TIME = datetime.now()
             return False
         
-        if (LAST_ALERT_CACHED != alert_text):
+        if LAST_ALERT_CACHED != alert_text:
             # We have an RPI Alert!
             # Let's hope its not too late!
             ALERT_CACHE_TIME = datetime.now()
@@ -123,9 +123,10 @@ async def help(ctx):
 async def delete(ctx, rng : str = ''):
     '''Deletes your messages in a channel. Needs a range, either in hours as a float or `all`.'''
     async with ctx.typing():
+        msg_time = ctx.message.created_at
         if rng == '':
-                await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
-                return
+            await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
+            return
         elif rng.lower() == 'all':
             after_date = None
         elif rng.lower() == 'me':
@@ -134,17 +135,16 @@ async def delete(ctx, rng : str = ''):
         else:
             try:
                 rng = float(rng)
-                after_date = datetime.utcnow() - timedelta(hours=rng)
+                after_date = msg_time - timedelta(hours=rng)
             except:
                 await ctx.channel.send("`?delete` needs a valid argument, either `all` or a number of hours to delete.")
                 return
         history = await ctx.channel.history(limit=None, after=after_date).flatten()
-        filtered = [x for x in history if x.author.id == ctx.author.id]
+        filtered = list(filter(lambda x: x.author.id == ctx.author.id, history))
         filtered_chunks = [filtered[i:i+100] for i in range(0, len(filtered), 100)]
         for c in filtered_chunks:
-            if c[0].created_at <= (datetime.utcnow() - timedelta(days=14)) or c[-1].created_at <= (datetime.utcnow() - timedelta(days=14)):
-                for m in c:
-                    await m.delete()
+            if c[0].created_at <= (msg_time - timedelta(days=14)) or c[-1].created_at <= (msg_time - timedelta(days=14)):
+                await asyncio.gather(*[m.delete() for m in c])
             else:
                 await ctx.channel.delete_messages(c)
         try:
@@ -210,7 +210,7 @@ async def shutdown(ctx):
 @tasks.loop(seconds=60)
 async def alertCheckLoop():
     await bot.wait_until_ready()
-    if (checkRPIAlert()):
+    if checkRPIAlert():
         await bot.get_channel(settings.announcements_channel).send(embed=createAlertEmbed())
 
 #########################
@@ -221,4 +221,3 @@ token = open('token').read().strip()
 
 alertCheckLoop.start()
 bot.run(token)
-
