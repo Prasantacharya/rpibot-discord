@@ -7,6 +7,7 @@ import logging
 from datetime import datetime, timedelta
 import settings
 import requests
+import subprocess
 
 logging.basicConfig(level=logging.INFO)
 
@@ -208,6 +209,16 @@ async def shutdown(ctx):
             await ctx.message.add_reaction("❌")
         except:
             return
+
+# Source: https://gitlab.com/rpi-academic-discord/slithering-duck/-/blob/master/bot/triggers/commands/version.py
+@bot.command()
+def version(ctx):
+    log = (
+        subprocess.check_output(["git", "log", "-n", "1"])
+        .decode("utf-8")
+        .strip(" \r\n")
+    )
+    ctx.channel.send("'''" + log + "''''")
 
 @tasks.loop(seconds=60)
 async def alertCheckLoop():
