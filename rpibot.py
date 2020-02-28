@@ -94,7 +94,7 @@ async def on_message(message):
 async def info(ctx):
     '''Shows info about the bot.'''
     embed = discord.Embed(title='About ComputerMan', description=bot.description, colour=settings.blue)
-    embed = embed.add_field(name='Contributing', value='Check out the source on GitHub: https://github.com/ClassAbbyAmp/rpibot-discord', inline=False)
+    embed = embed.add_field(name='Contributing', value='Check out the source on GitHub: https://github.com/johnnyapol/rpibot-discord', inline=False)
     embed = embed.add_field(name='License', value='ComputerMan is released under the GNU General Public License, version 3.0', inline=False)
     await ctx.send(embed=embed)
 
