@@ -86,9 +86,6 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if 'xd' in message.content.lower():
-        await message.add_reaction(discord.utils.find(lambda x: x.id == 564136561927651338, bot.emojis))
-
     await bot.process_commands(message)
 
 @bot.command(aliases=['about'])
