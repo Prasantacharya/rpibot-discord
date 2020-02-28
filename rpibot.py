@@ -209,13 +209,13 @@ async def shutdown(ctx):
 
 # Source: https://gitlab.com/rpi-academic-discord/slithering-duck/-/blob/master/bot/triggers/commands/version.py
 @bot.command()
-def version(ctx):
+async def version(ctx):
     log = (
         subprocess.check_output(["git", "log", "-n", "1"])
         .decode("utf-8")
         .strip(" \r\n")
     )
-    ctx.channel.send("'''" + log + "''''")
+    await ctx.channel.send("'''" + log + "''''")
 
 @tasks.loop(seconds=60)
 async def alertCheckLoop():
