@@ -27,6 +27,8 @@ ALERT_CACHE_TIME = datetime.now()
         False otherwise
 '''
 def checkRPIAlert():
+    # FIXME: Needs to be updated
+    return
     global LAST_ALERT_CACHED
     try:
         web_request = requests.get(API_LINK).text
