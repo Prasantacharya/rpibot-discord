@@ -215,7 +215,7 @@ async def version(ctx):
         .decode("utf-8")
         .strip(" \r\n")
     )
-    await ctx.channel.send("'''" + log + "''''")
+    await ctx.channel.send("```" + log + "```")
 
 @tasks.loop(seconds=60)
 async def alertCheckLoop():
